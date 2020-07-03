@@ -17,4 +17,20 @@ class CoordinateTest {
         val otherCoordinate = Coordinate(9, 12)
         assertNotEquals(coordinate, otherCoordinate)
     }
+
+    @Test
+    fun shouldReturn42ForUpCommand52() {
+        val actualCoordinate = Coordinate(5, 2)
+        actualCoordinate.move(Command.UP)
+        val expectedCoordinate = Coordinate(4, 2)
+        assertEquals(expectedCoordinate, actualCoordinate)
+    }
+
+    @Test
+    fun shouldReturn31ForRightCommand30() {
+        val actualCoordinate = Coordinate(3, 0)
+        actualCoordinate.move(Command.RIGHT)
+        val expectedCoordinate = Coordinate(3, 1)
+        assertEquals(expectedCoordinate, actualCoordinate)
+    }
 }
