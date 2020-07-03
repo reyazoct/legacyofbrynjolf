@@ -17,17 +17,15 @@ class Room(initialState: List<List<Entity>>) {
 
     fun executeCommands(commands: List<Command>) {
         if (gameState != GameState.UNDECIDED) throw Exception("Game Already Completed")
-        commands.forEach {
-            if (gameState != GameState.UNDECIDED) return
-            executeCommand(it)
+        commands.forEachIndexed { index, command ->
+            if (gameState != GameState.UNDECIDED || index >= MAX_MOVES_ALLOWED) return
+            executeCommand(command)
         }
     }
 
     fun executeCommand(command: Command) {
         if (gameState != GameState.UNDECIDED) return
-        MOVABLE_ENTITIES.forEach {
-            it.executeCommand(command)
-        }
+        MOVABLE_ENTITIES.forEach { it.executeCommand(command) }
     }
 
     private fun Entity.executeCommand(command: Command) {
@@ -88,5 +86,6 @@ class Room(initialState: List<List<Entity>>) {
 
     companion object {
         private val MOVABLE_ENTITIES = listOf(Entity.BRYNJOLF, Entity.GUARD)
+        private const val MAX_MOVES_ALLOWED = 4
     }
 }

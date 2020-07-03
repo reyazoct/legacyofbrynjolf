@@ -113,6 +113,18 @@ class RoomTest {
         assertEquals(expectedMessage, exception.message)
     }
 
+    @Test
+    fun shouldExecuteOnlyFourMoves() {
+        val finalState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.GUARD, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.BRYNJOLF, Entity.WALL, Entity.GUARD)
+        )
+        val expectedRoom = Room(finalState)
+        room.executeCommands(listOf(Command.DOWN, Command.LEFT, Command.RIGHT, Command.LEFT, Command.UP))
+        assertEquals(expectedRoom, room)
+    }
+
     private fun <T> assertListEquals(listOne: List<T>, listTwo: List<T>) {
         assertTrue { listOne.size == listTwo.size && listOne.containsAll(listTwo) && listTwo.containsAll(listOne) }
     }
