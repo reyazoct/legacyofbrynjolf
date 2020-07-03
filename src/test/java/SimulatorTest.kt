@@ -55,4 +55,18 @@ class SimulatorTest {
         simulator.simulate()
         assertEquals(listOf(Command.RIGHT, Command.UP), simulator.getRemainingMoves())
     }
+
+    @Test
+    fun showSimulatedCommandsCaseTwo() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE)
+        )
+        val room = Room(initialState)
+        val simulator = Simulator(room)
+        simulator.simulate()
+        assertEquals(listOf(Command.RIGHT, Command.UP), simulator.getRemainingMoves())
+    }
 }

@@ -32,8 +32,9 @@ class Simulator(private val room: Room, moves: List<Command>? = null) {
         possibleMoves.forEach {
             if (isRepeatingSequence(executedMoves, it)) return@forEach
             val newRoom = room.executeCommandAsNewRoom(it)
-            executedMoves.add(it)
-            val simulatedMoves = simulate(newRoom, executedMoves.toMutableList())
+            val temp = executedMoves.toMutableList()
+            temp.add(it)
+            val simulatedMoves = simulate(newRoom, temp.toMutableList())
             if (simulatedMoves.isNullOrEmpty()) return@forEach
             if (verifiedMoves == null || simulatedMoves.size < verifiedMoves!!.size) verifiedMoves = simulatedMoves
         }

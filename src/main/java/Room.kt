@@ -111,6 +111,7 @@ class Room(initialState: List<List<Entity>>) {
         val possibleMovesList = mutableSetOf<Command>()
         if (gameState != GameState.UNDECIDED) return possibleMovesList.toList()
         val brynjolfCoordinate = findCoordinates(Entity.BRYNJOLF).first()
+        val guardCoordinates = findCoordinates(Entity.GUARD)
 
         var recentBlockerStart = Entity.WALL
         for (positionX in 0 until brynjolfCoordinate.posX) {
@@ -123,8 +124,10 @@ class Room(initialState: List<List<Entity>>) {
         }
 
         if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
-            possibleMovesList.add(Command.RIGHT)
-            possibleMovesList.add(Command.LEFT)
+            listOf(Command.RIGHT, Command.LEFT).forEach { command ->
+                if (isNotBlocked(brynjolfCoordinate, command, Entity.BRYNJOLF) || (guardCoordinates.isNotEmpty() && (guardCoordinates.all { isNotBlocked(it, command, Entity.GUARD) })))
+                    possibleMovesList.add(command)
+            }
         }
 
         recentBlockerStart = Entity.WALL
@@ -138,8 +141,10 @@ class Room(initialState: List<List<Entity>>) {
         }
 
         if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
-            possibleMovesList.add(Command.UP)
-            possibleMovesList.add(Command.DOWN)
+            listOf(Command.UP, Command.DOWN).forEach { command ->
+                if (isNotBlocked(brynjolfCoordinate, command, Entity.BRYNJOLF) || (guardCoordinates.isNotEmpty() && (guardCoordinates.all { isNotBlocked(it, command, Entity.GUARD) })))
+                    possibleMovesList.add(command)
+            }
         }
 
         return possibleMovesList.toList()
