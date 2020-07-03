@@ -28,7 +28,32 @@ class RoomTest {
         assertListEquals(expectedCoordinate, room.findCoordinates(Entity.GUARD))
     }
 
+    @Test
+    fun shouldReturnCorrectStateForCommandDownForBrynjolf() {
+        val finalState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.BRYNJOLF, Entity.WALL, Entity.GUARD)
+        )
+        val expectedRoom = Room(finalState)
+        room.executeCommand(Command.DOWN)
+        assertEquals(expectedRoom, room)
+    }
+
+    @Test
+    fun shouldReturnCorrectStateForCommandRightForBrynjolf() {
+        val finalState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
+        )
+        val expectedRoom = Room(finalState)
+        room.executeCommand(Command.RIGHT)
+        assertEquals(expectedRoom, room)
+    }
+
     private fun <T> assertListEquals(listOne: List<T>, listTwo: List<T>) {
         assertTrue { listOne.size == listTwo.size && listOne.containsAll(listTwo) && listTwo.containsAll(listOne) }
     }
+
 }
