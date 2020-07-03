@@ -1,5 +1,8 @@
 class Room(initialState: List<List<Entity>>) {
     private val currentState: List<MutableList<Entity>> = initialState as List<MutableList<Entity>>
+    var gameState = GameState.UNDECIDED
+        private set
+        get() = field
 
     fun findCoordinates(entity: Entity): List<Coordinate> {
         val coordinates = mutableListOf<Coordinate>()
@@ -14,8 +17,9 @@ class Room(initialState: List<List<Entity>>) {
     }
 
     fun executeCommand(command: Command) {
-        MOVE_ABLE_ENTITIES.forEach { entity ->
-            entity.executeCommand(command)
+        if (gameState != GameState.UNDECIDED) return
+        MOVABLE_ENTITIES.forEach {
+            it.executeCommand(command)
         }
     }
 
@@ -42,10 +46,22 @@ class Room(initialState: List<List<Entity>>) {
     }
 
     private fun changeState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate, entity: Entity, previousEntity: Entity): Entity {
+        setGameState(coordinateBeforeCommand, coordinateAfterCommand)
         val entityToStore = currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX]
         currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] = previousEntity
         currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = entity
         return entityToStore
+    }
+
+    private fun setGameState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate) {
+        if (gameState != GameState.UNDECIDED) return
+        if (currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] == Entity.GUARD &&
+                currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] == Entity.BRYNJOLF) {
+            gameState = GameState.LOSE
+        } else if (currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] == Entity.BRYNJOLF &&
+                currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] == Entity.EXIT) {
+            gameState = GameState.WIN
+        }
     }
 
 
@@ -65,6 +81,6 @@ class Room(initialState: List<List<Entity>>) {
     }
 
     companion object {
-        private val MOVE_ABLE_ENTITIES = listOf(Entity.BRYNJOLF, Entity.GUARD)
+        private val MOVABLE_ENTITIES = listOf(Entity.BRYNJOLF, Entity.GUARD)
     }
 }

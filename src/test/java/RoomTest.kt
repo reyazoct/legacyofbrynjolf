@@ -1,4 +1,3 @@
-import jdk.nashorn.internal.ir.annotations.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -66,17 +65,17 @@ class RoomTest {
         assertEquals(expectedRoom, room)
     }
 
-    @Ignore
     @Test
-    fun shouldReturnCorrectStateForCommandRightForAllMoveAbleEntities() {
-        val finalState = listOf(
-                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.GUARD),
-                listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EXIT),
-                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
-        )
-        val expectedRoom = Room(finalState)
+    fun shouldWonOnCommandRight() {
         room.executeCommand(Command.RIGHT)
-        assertEquals(expectedRoom, room)
+        assertEquals(GameState.WIN, room.gameState)
+    }
+
+    @Test
+    fun shouldLoseOnCommandUpAndRight() {
+        room.executeCommand(Command.UP)
+        room.executeCommand(Command.RIGHT)
+        assertEquals(GameState.LOSE, room.gameState)
     }
 
     private fun <T> assertListEquals(listOne: List<T>, listTwo: List<T>) {
