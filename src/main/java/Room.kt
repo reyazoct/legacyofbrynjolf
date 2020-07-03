@@ -6,7 +6,7 @@ class Room(initialState: List<List<Entity>>) {
         currentState.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { columnIndex, column ->
                 if (column == entity) {
-                    coordinates.add(Coordinate(rowIndex, columnIndex))
+                    coordinates.add(Coordinate(columnIndex, rowIndex))
                 }
             }
         }
@@ -21,24 +21,27 @@ class Room(initialState: List<List<Entity>>) {
 
     private fun Entity.executeCommand(command: Command) {
         findCoordinates(this).forEach {
-            if (isBlocked(it, command)) return@forEach
-            val coordinateAfterCommand = it.move(command)
-            changeState(it, coordinateAfterCommand, this)
+            var coordinateBeforeCommand = it
+            while (isNotBlocked(coordinateBeforeCommand, command)) {
+                val coordinateAfterCommand = coordinateBeforeCommand.move(command)
+                changeState(coordinateBeforeCommand, coordinateAfterCommand, this)
+                coordinateBeforeCommand = coordinateAfterCommand
+            }
         }
     }
 
-    private fun isBlocked(coordinate: Coordinate, command: Command): Boolean {
+    private fun isNotBlocked(coordinate: Coordinate, command: Command): Boolean {
         return when (command) {
-            Command.UP -> coordinate.posY <= 0
-            Command.RIGHT -> coordinate.posX >= currentState.first().size - 1
-            Command.DOWN -> coordinate.posY >= currentState.size - 1
-            Command.LEFT -> coordinate.posX <= 0
+            Command.UP -> coordinate.posY > 0 && currentState[coordinate.posY - 1][coordinate.posX] != Entity.WALL
+            Command.RIGHT -> coordinate.posX < currentState.first().size - 1 && currentState[coordinate.posY][coordinate.posX + 1] != Entity.WALL
+            Command.DOWN -> coordinate.posY < currentState.size - 1 && currentState[coordinate.posY + 1][coordinate.posX] != Entity.WALL
+            Command.LEFT -> coordinate.posX > 0 && currentState[coordinate.posY][coordinate.posX - 1] != Entity.WALL
         }
     }
 
     private fun changeState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate, entity: Entity) {
-        currentState[coordinateBeforeCommand.posX][coordinateBeforeCommand.posY] = Entity.EMPTY_SPACE
-        currentState[coordinateAfterCommand.posX][coordinateAfterCommand.posY] = entity
+        currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] = Entity.EMPTY_SPACE
+        currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = entity
     }
 
 
@@ -58,6 +61,6 @@ class Room(initialState: List<List<Entity>>) {
     }
 
     companion object {
-        private val MOVE_ABLE_ENTITIES = listOf<Entity>(Entity.BRYNJOLF, Entity.GUARD)
+        private val MOVE_ABLE_ENTITIES = listOf(Entity.BRYNJOLF, Entity.GUARD)
     }
 }
