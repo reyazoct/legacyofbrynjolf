@@ -71,8 +71,7 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
-
-    private fun displayCurrentState() {
+    fun displayCurrentState() {
         currentState.forEach { eachRow ->
             println(eachRow.map { it.symbol }.joinToString(DELIMITER))
         }
