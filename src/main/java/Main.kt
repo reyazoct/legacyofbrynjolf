@@ -3,11 +3,11 @@ import java.io.FileReader
 import java.lang.Exception
 
 fun main(args: Array<String>) {
-    if (args.isEmpty()) throw Exception("Commands not found")
     val room = readFile()
-    room.executeCommands(args.first().toCharArray().map { Command.fromSymbol(it) })
-    room.displayCurrentState()
-    println(room.gameState)
+    val simulator = Simulator(room, args.firstOrNull()?.toCharArray()?.map { Command.fromSymbol(it) })
+    simulator.simulate()
+    println(simulator.getRemainingMoves())
+    println(simulator.getRoomGameState())
 }
 
 fun readFile(): Room {

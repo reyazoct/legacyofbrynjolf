@@ -10,7 +10,14 @@ class Simulator(private val room: Room, moves: List<Command>? = null) {
     }
 
     fun simulate() {
-        simulate(room)?.let { remainingMoves.addAll(it) }
+        simulate(room)?.let {
+            room.executeCommands(it)
+            remainingMoves.addAll(it)
+        }
+    }
+
+    fun getRoomGameState(): GameState {
+        return room.gameState
     }
 
     private fun simulate(room: Room, executedMoves: MutableList<Command> = mutableListOf()): List<Command>? {
