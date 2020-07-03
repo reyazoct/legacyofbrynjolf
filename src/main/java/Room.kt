@@ -69,6 +69,37 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
+    fun commandIfBrynjolfAndExitInSameLineWithoutBlocker(): Command? {
+        if (gameState != GameState.UNDECIDED) return null
+        val brynjolfCoordinate = findCoordinates(Entity.BRYNJOLF).first()
+        val exitCoordinate = findCoordinates(Entity.EXIT).first()
+        val isInSameX = brynjolfCoordinate.posX == exitCoordinate.posX
+        if (isInSameX) return commandIfNoBlocker(brynjolfCoordinate.posX, brynjolfCoordinate.posY, exitCoordinate.posY)
+        val isInSameY = brynjolfCoordinate.posY == exitCoordinate.posY
+        if (isInSameY) return commandIfNoBlocker(brynjolfCoordinate.posY, brynjolfCoordinate.posX, exitCoordinate.posX, true)
+        return null
+    }
+
+    private fun commandIfNoBlocker(samePosition: Int, differentPositionOne: Int, differentPositionTwo: Int, invert: Boolean = false): Command? {
+        val startPosition = if (differentPositionOne > differentPositionTwo) differentPositionTwo else differentPositionOne
+        val endPosition = if (startPosition == differentPositionOne) differentPositionTwo else differentPositionOne
+        var isBlocker = false
+        for (position in startPosition + 1 until endPosition) {
+            if (currentState[if (invert) position else samePosition][if (invert) samePosition else position] != Entity.EMPTY_SPACE) {
+                isBlocker = true
+                break
+            }
+        }
+        if (isBlocker) return null
+        return when {
+            differentPositionOne < differentPositionTwo && invert -> Command.RIGHT
+            differentPositionTwo < differentPositionOne && invert -> Command.LEFT
+            differentPositionOne < differentPositionTwo && !invert -> Command.DOWN
+            differentPositionTwo < differentPositionOne && !invert -> Command.UP
+            else -> null
+        }
+    }
+
     fun displayCurrentState() {
         currentState.forEach { eachRow ->
             println(eachRow.map { it.symbol }.joinToString(DELIMITER))
