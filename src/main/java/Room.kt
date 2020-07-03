@@ -22,9 +22,10 @@ class Room(initialState: List<List<Entity>>) {
     private fun Entity.executeCommand(command: Command) {
         findCoordinates(this).forEach {
             var coordinateBeforeCommand = it
+            var previousEntity = Entity.EMPTY_SPACE
             while (isNotBlocked(coordinateBeforeCommand, command, this)) {
                 val coordinateAfterCommand = coordinateBeforeCommand.move(command)
-                changeState(coordinateBeforeCommand, coordinateAfterCommand, this)
+                previousEntity = changeState(coordinateBeforeCommand, coordinateAfterCommand, this, previousEntity)
                 coordinateBeforeCommand = coordinateAfterCommand
             }
         }
@@ -40,9 +41,11 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
-    private fun changeState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate, entity: Entity) {
-        currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] = Entity.EMPTY_SPACE
+    private fun changeState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate, entity: Entity, previousEntity: Entity): Entity {
+        val entityToStore = currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX]
+        currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] = previousEntity
         currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = entity
+        return entityToStore
     }
 
 

@@ -53,6 +53,19 @@ class RoomTest {
         assertEquals(expectedRoom, room)
     }
 
+    @Test
+    fun shouldNotOverLapOtherEntityWhileMove() {
+        val finalState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.GUARD),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
+        )
+        val expectedRoom = Room(finalState)
+        room.executeCommand(Command.UP)
+        room.executeCommand(Command.RIGHT)
+        assertEquals(expectedRoom, room)
+    }
+
     @Ignore
     @Test
     fun shouldReturnCorrectStateForCommandRightForAllMoveAbleEntities() {
