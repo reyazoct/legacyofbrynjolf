@@ -4,12 +4,12 @@ data class Coordinate(var posX: Int, var posY: Int) {
         return posX == other.posX && posY == other.posY
     }
 
-    fun move(command: Command) {
-        when (command) {
-            Command.UP -> posX -= 1
-            Command.RIGHT -> posY += 1
-            Command.DOWN -> posX += 1
-            Command.LEFT -> posY -= 1
+    fun move(command: Command): Coordinate {
+        return when (command) {
+            Command.UP -> Coordinate(posX - 1, posY)
+            Command.RIGHT -> Coordinate(posX, posY + 1)
+            Command.DOWN -> Coordinate(posX + 1, posY)
+            Command.LEFT -> Coordinate(posX, posY - 1)
         }
     }
 

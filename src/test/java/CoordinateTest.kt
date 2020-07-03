@@ -20,16 +20,14 @@ class CoordinateTest {
 
     @Test
     fun shouldReturn42ForUpCommand52() {
-        val actualCoordinate = Coordinate(5, 2)
-        actualCoordinate.move(Command.UP)
+        val actualCoordinate = Coordinate(5, 2).move(Command.UP)
         val expectedCoordinate = Coordinate(4, 2)
         assertEquals(expectedCoordinate, actualCoordinate)
     }
 
     @Test
     fun shouldReturn31ForRightCommand30() {
-        val actualCoordinate = Coordinate(3, 0)
-        actualCoordinate.move(Command.RIGHT)
+        val actualCoordinate = Coordinate(3, 0).move(Command.RIGHT)
         val expectedCoordinate = Coordinate(3, 1)
         assertEquals(expectedCoordinate, actualCoordinate)
     }
