@@ -23,6 +23,13 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
+    fun executeCommandAsNewRoom(command: Command): Room {
+        val currentStateCopy = currentState.map { it.toList() }
+        val roomCopy = Room(currentStateCopy)
+        roomCopy.executeCommand(command)
+        return roomCopy
+    }
+
     fun executeCommand(command: Command) {
         if (gameState != GameState.UNDECIDED) return
         MOVABLE_ENTITIES.forEach { it.executeCommand(command) }
@@ -85,7 +92,7 @@ class Room(initialState: List<List<Entity>>) {
         val endPosition = if (startPosition == differentPositionOne) differentPositionTwo else differentPositionOne
         var isBlocker = false
         for (position in startPosition + 1 until endPosition) {
-            if (currentState[if (invert) position else samePosition][if (invert) samePosition else position] != Entity.EMPTY_SPACE) {
+            if (currentState[if (invert) samePosition else position][if (invert) position else samePosition] != Entity.EMPTY_SPACE) {
                 isBlocker = true
                 break
             }
