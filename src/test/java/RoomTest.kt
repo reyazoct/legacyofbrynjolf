@@ -1,3 +1,4 @@
+import jdk.nashorn.internal.ir.annotations.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -29,10 +30,10 @@ class RoomTest {
     }
 
     @Test
-    fun shouldReturnCorrectStateForCommandDownForBrynjolf() {
+    fun shouldReturnCorrectStateForCommandDownForAllMoveAbleEntities() {
         val finalState = listOf(
-                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE),
-                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.EXIT),
                 listOf(Entity.BRYNJOLF, Entity.WALL, Entity.GUARD)
         )
         val expectedRoom = Room(finalState)
@@ -41,9 +42,9 @@ class RoomTest {
     }
 
     @Test
-    fun shouldReturnCorrectStateForCommandRightForBrynjolf() {
+    fun shouldReturnCorrectStateForCommandRightForAllMoveAbleEntities() {
         val finalState = listOf(
-                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.GUARD),
                 listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EXIT),
                 listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
         )
