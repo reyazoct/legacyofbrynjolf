@@ -6,10 +6,10 @@ data class Coordinate(var posX: Int, var posY: Int) {
 
     fun move(command: Command): Coordinate {
         return when (command) {
-            Command.UP -> Coordinate(posX - 1, posY)
-            Command.RIGHT -> Coordinate(posX, posY + 1)
-            Command.DOWN -> Coordinate(posX + 1, posY)
-            Command.LEFT -> Coordinate(posX, posY - 1)
+            Command.UP -> Coordinate(posX, posY - 1)
+            Command.RIGHT -> Coordinate(posX + 1, posY)
+            Command.DOWN -> Coordinate(posX, posY + 1)
+            Command.LEFT -> Coordinate(posX - 1, posY)
         }
     }
 
