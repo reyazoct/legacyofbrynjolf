@@ -10,14 +10,31 @@ class Simulator(private val room: Room, moves: List<Command>? = null) {
     }
 
     fun simulate() {
-        if (room.gameState != GameState.UNDECIDED) return
-        if (checkBrynjolfAndExitInSameLineWithoutBlocker()) return
+        simulate(room)?.let { remainingMoves.addAll(it) }
     }
 
-    private fun checkBrynjolfAndExitInSameLineWithoutBlocker(): Boolean {
+    private fun simulate(room: Room, executedMoves: MutableList<Command> = mutableListOf()): List<Command>? {
+        if (room.gameState != GameState.UNDECIDED) return executedMoves.toList()
         room.commandIfBrynjolfAndExitInSameLineWithoutBlocker()?.let {
-            remainingMoves.add(it)
-            return true
-        } ?: run { return false }
+            executedMoves.add(it)
+            return executedMoves.toList()
+        }
+        val possibleMoves = room.getPossibleMoves()
+        if (possibleMoves.isEmpty()) return null
+        var verifiedMoves: List<Command>? = null
+        possibleMoves.forEach {
+            if (isRepeatingSequence(executedMoves, it)) return@forEach
+            val newRoom = room.executeCommandAsNewRoom(it)
+            executedMoves.add(it)
+            val simulatedMoves = simulate(newRoom, executedMoves.toMutableList())
+            if (simulatedMoves.isNullOrEmpty()) return@forEach
+            if (verifiedMoves == null || simulatedMoves.size < verifiedMoves!!.size) verifiedMoves = simulatedMoves
+        }
+        return verifiedMoves
+    }
+
+    private fun isRepeatingSequence(commands: List<Command>, command: Command): Boolean {
+        if (commands.isEmpty()) return false
+        return commands[commands.size - 1] == command || commands[commands.size - 1] == command.getOppositeCommand()
     }
 }
