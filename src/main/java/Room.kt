@@ -2,7 +2,6 @@ class Room(initialState: List<List<Entity>>) {
     private val currentState: List<MutableList<Entity>> = initialState as List<MutableList<Entity>>
     var gameState = GameState.UNDECIDED
         private set
-        get() = field
 
     fun findCoordinates(entity: Entity): List<Coordinate> {
         val coordinates = mutableListOf<Coordinate>()
@@ -14,6 +13,14 @@ class Room(initialState: List<List<Entity>>) {
             }
         }
         return coordinates
+    }
+
+    fun executeCommands(commands: List<Command>) {
+        if (gameState != GameState.UNDECIDED) throw Exception("Game Already Completed")
+        commands.forEach {
+            if (gameState != GameState.UNDECIDED) return
+            executeCommand(it)
+        }
     }
 
     fun executeCommand(command: Command) {

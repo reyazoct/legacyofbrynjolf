@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class RoomTest {
@@ -76,6 +77,40 @@ class RoomTest {
         room.executeCommand(Command.UP)
         room.executeCommand(Command.RIGHT)
         assertEquals(GameState.LOSE, room.gameState)
+    }
+
+    @Test
+    fun shouldWinOnCommandsURDR() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.EMPTY_SPACE, Entity.WALL),
+                listOf(Entity.GUARD, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.WALL, Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE)
+        )
+        val actualRoom = Room(initialState)
+        actualRoom.executeCommands(listOf(Command.UP, Command.RIGHT, Command.DOWN, Command.RIGHT))
+        assertEquals(GameState.WIN, actualRoom.gameState)
+    }
+
+    @Test
+    fun shouldLoseOnCommandsLUDRRR() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.EMPTY_SPACE, Entity.WALL),
+                listOf(Entity.GUARD, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.BRYNJOLF, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.WALL, Entity.EMPTY_SPACE, Entity.GUARD, Entity.EMPTY_SPACE)
+        )
+        val actualRoom = Room(initialState)
+        actualRoom.executeCommands(listOf(Command.LEFT, Command.UP, Command.DOWN, Command.RIGHT, Command.RIGHT, Command.RIGHT))
+        assertEquals(GameState.LOSE, actualRoom.gameState)
+    }
+
+    @Test
+    fun shouldThrowErrorIfGameIsAlreadyDecided() {
+        val expectedMessage = "Game Already Completed"
+        room.executeCommand(Command.RIGHT)
+        val exception = assertFailsWith<Exception> { room.executeCommands(listOf(Command.RIGHT, Command.LEFT)) }
+        assertEquals(expectedMessage, exception.message)
     }
 
     private fun <T> assertListEquals(listOne: List<T>, listTwo: List<T>) {
