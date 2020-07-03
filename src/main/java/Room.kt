@@ -100,6 +100,44 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
+    fun getPossibleMoves(): List<Command> {
+        val possibleMovesList = mutableSetOf<Command>()
+        if (gameState != GameState.UNDECIDED) return possibleMovesList.toList()
+        val brynjolfCoordinate = findCoordinates(Entity.BRYNJOLF).first()
+
+        var recentBlockerStart = Entity.WALL
+        for (positionX in 0 until brynjolfCoordinate.posX) {
+            if (currentState[brynjolfCoordinate.posY][positionX] != Entity.EMPTY_SPACE) recentBlockerStart = currentState[brynjolfCoordinate.posY][positionX]
+        }
+
+        var recentBlockerEnd = Entity.WALL
+        for (positionX in currentState.first().size - 1 downTo brynjolfCoordinate.posX + 1) {
+            if (currentState[brynjolfCoordinate.posY][positionX] != Entity.EMPTY_SPACE) recentBlockerEnd = currentState[brynjolfCoordinate.posY][positionX]
+        }
+
+        if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
+            possibleMovesList.add(Command.RIGHT)
+            possibleMovesList.add(Command.LEFT)
+        }
+
+        recentBlockerStart = Entity.WALL
+        for (positionY in 0 until brynjolfCoordinate.posY) {
+            if (currentState[positionY][brynjolfCoordinate.posX] != Entity.EMPTY_SPACE) recentBlockerStart = currentState[positionY][brynjolfCoordinate.posX]
+        }
+
+        recentBlockerEnd = Entity.WALL
+        for (positionY in currentState.size - 1 downTo brynjolfCoordinate.posY + 1) {
+            if (currentState[positionY][brynjolfCoordinate.posX] != Entity.EMPTY_SPACE) recentBlockerEnd = currentState[positionY][brynjolfCoordinate.posX]
+        }
+
+        if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
+            possibleMovesList.add(Command.UP)
+            possibleMovesList.add(Command.DOWN)
+        }
+
+        return possibleMovesList.toList()
+    }
+
     fun displayCurrentState() {
         currentState.forEach { eachRow ->
             println(eachRow.map { it.symbol }.joinToString(DELIMITER))
@@ -114,6 +152,7 @@ class Room(initialState: List<List<Entity>>) {
     override fun hashCode(): Int {
         return currentState.hashCode()
     }
+
 
     companion object {
         private val MOVABLE_ENTITIES = listOf(Entity.BRYNJOLF, Entity.GUARD)

@@ -125,8 +125,40 @@ class RoomTest {
         assertEquals(expectedRoom, room)
     }
 
+    @Test
+    fun shouldReturnPossibleMovesCaseOne() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.GUARD, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.BRYNJOLF, Entity.WALL, Entity.GUARD)
+        )
+        val actualRoom = Room(initialState)
+        assertListEquals(listOf(Command.LEFT, Command.RIGHT), actualRoom.getPossibleMoves())
+    }
+
+    @Test
+    fun shouldReturnPossibleMovesCaseTwo() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.GUARD, Entity.BRYNJOLF, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.GUARD, Entity.GUARD)
+        )
+        val actualRoom = Room(initialState)
+        assertListEquals(emptyList(), actualRoom.getPossibleMoves())
+    }
+
+    @Test
+    fun shouldReturnPossibleMovesCaseThree() {
+        val initialState = listOf(
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EMPTY_SPACE),
+                listOf(Entity.GUARD, Entity.BRYNJOLF, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
+        )
+        val actualRoom = Room(initialState)
+        assertListEquals(listOf(Command.UP, Command.DOWN), actualRoom.getPossibleMoves())
+    }
+
     private fun <T> assertListEquals(listOne: List<T>, listTwo: List<T>) {
         assertTrue { listOne.size == listTwo.size && listOne.containsAll(listTwo) && listTwo.containsAll(listOne) }
     }
-
 }
