@@ -41,6 +41,18 @@ class RoomTest {
         assertEquals(expectedRoom, room)
     }
 
+    @Test
+    fun shouldReturnCorrectStateForCommandUpForAllMoveAbleEntities() {
+        val finalState = listOf(
+                listOf(Entity.BRYNJOLF, Entity.GUARD, Entity.EMPTY_SPACE),
+                listOf(Entity.EMPTY_SPACE, Entity.EMPTY_SPACE, Entity.EXIT),
+                listOf(Entity.EMPTY_SPACE, Entity.WALL, Entity.GUARD)
+        )
+        val expectedRoom = Room(finalState)
+        room.executeCommand(Command.UP)
+        assertEquals(expectedRoom, room)
+    }
+
     @Ignore
     @Test
     fun shouldReturnCorrectStateForCommandRightForAllMoveAbleEntities() {

@@ -22,7 +22,7 @@ class Room(initialState: List<List<Entity>>) {
     private fun Entity.executeCommand(command: Command) {
         findCoordinates(this).forEach {
             var coordinateBeforeCommand = it
-            while (isNotBlocked(coordinateBeforeCommand, command)) {
+            while (isNotBlocked(coordinateBeforeCommand, command, this)) {
                 val coordinateAfterCommand = coordinateBeforeCommand.move(command)
                 changeState(coordinateBeforeCommand, coordinateAfterCommand, this)
                 coordinateBeforeCommand = coordinateAfterCommand
@@ -30,12 +30,13 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
-    private fun isNotBlocked(coordinate: Coordinate, command: Command): Boolean {
+    private fun isNotBlocked(coordinate: Coordinate, command: Command, entity: Entity): Boolean {
+        val blockers = if (entity == Entity.BRYNJOLF) listOf(Entity.WALL) else listOf(Entity.WALL, Entity.EXIT)
         return when (command) {
-            Command.UP -> coordinate.posY > 0 && currentState[coordinate.posY - 1][coordinate.posX] != Entity.WALL
-            Command.RIGHT -> coordinate.posX < currentState.first().size - 1 && currentState[coordinate.posY][coordinate.posX + 1] != Entity.WALL
-            Command.DOWN -> coordinate.posY < currentState.size - 1 && currentState[coordinate.posY + 1][coordinate.posX] != Entity.WALL
-            Command.LEFT -> coordinate.posX > 0 && currentState[coordinate.posY][coordinate.posX - 1] != Entity.WALL
+            Command.UP -> coordinate.posY > 0 && !blockers.contains(currentState[coordinate.posY - 1][coordinate.posX])
+            Command.RIGHT -> coordinate.posX < currentState.first().size - 1 && !blockers.contains(currentState[coordinate.posY][coordinate.posX + 1])
+            Command.DOWN -> coordinate.posY < currentState.size - 1 && !blockers.contains(currentState[coordinate.posY + 1][coordinate.posX])
+            Command.LEFT -> coordinate.posX > 0 && !blockers.contains(currentState[coordinate.posY][coordinate.posX - 1])
         }
     }
 
