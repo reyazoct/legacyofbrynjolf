@@ -80,11 +80,12 @@ class Room(initialState: List<List<Entity>>) {
         if (gameState != GameState.UNDECIDED) return null
         val brynjolfCoordinate = findCoordinates(Entity.BRYNJOLF).first()
         val exitCoordinate = findCoordinates(Entity.EXIT).first()
-        val isInSameX = brynjolfCoordinate.posX == exitCoordinate.posX
-        if (isInSameX) return commandIfNoBlocker(brynjolfCoordinate.posX, brynjolfCoordinate.posY, exitCoordinate.posY)
-        val isInSameY = brynjolfCoordinate.posY == exitCoordinate.posY
-        if (isInSameY) return commandIfNoBlocker(brynjolfCoordinate.posY, brynjolfCoordinate.posX, exitCoordinate.posX, true)
-        return null
+
+        return when {
+            brynjolfCoordinate.posX == exitCoordinate.posX -> commandIfNoBlocker(brynjolfCoordinate.posX, brynjolfCoordinate.posY, exitCoordinate.posY)
+            brynjolfCoordinate.posY == exitCoordinate.posY -> commandIfNoBlocker(brynjolfCoordinate.posY, brynjolfCoordinate.posX, exitCoordinate.posX, true)
+            else -> null
+        }
     }
 
     private fun commandIfNoBlocker(samePosition: Int, differentPositionOne: Int, differentPositionTwo: Int, invert: Boolean = false): Command? {
@@ -107,45 +108,50 @@ class Room(initialState: List<List<Entity>>) {
         }
     }
 
+    private fun getRoomStateSize(xAxis: Boolean = true) = if (xAxis) currentState.first().size else currentState.size
+
+    private fun getAxisCommands(xAxis: Boolean = true) = if (xAxis) listOf(Command.LEFT, Command.RIGHT) else listOf(Command.UP, Command.DOWN)
+
+    private fun getPossibleMovesInSpecificAxis(brynjolfCoordinate: Coordinate, guardCoordinates: List<Coordinate>, xAxis: Boolean = true): List<Command> {
+        val fixedPosition = if (xAxis) brynjolfCoordinate.posY else brynjolfCoordinate.posX
+        val iteratorPosition = if (xAxis) brynjolfCoordinate.posX else brynjolfCoordinate.posY
+
+        val recentBlockerFromStart = getRecentBlockerInBetween(0, iteratorPosition, fixedPosition, xAxis)
+        val recentBlockerFromEnd = getRecentBlockerInBetween(getRoomStateSize(xAxis) - 1, iteratorPosition, fixedPosition, xAxis)
+
+        if (recentBlockerFromStart == Entity.WALL && recentBlockerFromEnd == Entity.WALL) {
+            val possibleMovesList = mutableListOf<Command>()
+            getAxisCommands(xAxis).forEach { command ->
+                if (isNotBlocked(brynjolfCoordinate, command, Entity.BRYNJOLF) ||
+                        (guardCoordinates.isNotEmpty() && (guardCoordinates.all { isNotBlocked(it, command, Entity.GUARD) })))
+                    possibleMovesList.add(command)
+            }
+            return possibleMovesList.toList()
+        }
+        return emptyList()
+    }
+
+
+    private fun getRecentBlockerInBetween(startValue: Int, endValue: Int, fixedPosition: Int, xAxis: Boolean = true): Entity {
+        var recentBlocker = Entity.WALL
+        val incrementValue = if (startValue < endValue) 1 else -1
+        var iterator = startValue
+        while (iterator != endValue) {
+            val entityInPosition = if (xAxis) currentState[fixedPosition][iterator] else currentState[iterator][fixedPosition]
+            if (entityInPosition != Entity.EMPTY_SPACE) recentBlocker = entityInPosition
+            iterator += incrementValue
+        }
+        return recentBlocker
+    }
+
     fun getPossibleMoves(): List<Command> {
         val possibleMovesList = mutableSetOf<Command>()
         if (gameState != GameState.UNDECIDED) return possibleMovesList.toList()
         val brynjolfCoordinate = findCoordinates(Entity.BRYNJOLF).first()
         val guardCoordinates = findCoordinates(Entity.GUARD)
 
-        var recentBlockerStart = Entity.WALL
-        for (positionX in 0 until brynjolfCoordinate.posX) {
-            if (currentState[brynjolfCoordinate.posY][positionX] != Entity.EMPTY_SPACE) recentBlockerStart = currentState[brynjolfCoordinate.posY][positionX]
-        }
-
-        var recentBlockerEnd = Entity.WALL
-        for (positionX in currentState.first().size - 1 downTo brynjolfCoordinate.posX + 1) {
-            if (currentState[brynjolfCoordinate.posY][positionX] != Entity.EMPTY_SPACE) recentBlockerEnd = currentState[brynjolfCoordinate.posY][positionX]
-        }
-
-        if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
-            listOf(Command.RIGHT, Command.LEFT).forEach { command ->
-                if (isNotBlocked(brynjolfCoordinate, command, Entity.BRYNJOLF) || (guardCoordinates.isNotEmpty() && (guardCoordinates.all { isNotBlocked(it, command, Entity.GUARD) })))
-                    possibleMovesList.add(command)
-            }
-        }
-
-        recentBlockerStart = Entity.WALL
-        for (positionY in 0 until brynjolfCoordinate.posY) {
-            if (currentState[positionY][brynjolfCoordinate.posX] != Entity.EMPTY_SPACE) recentBlockerStart = currentState[positionY][brynjolfCoordinate.posX]
-        }
-
-        recentBlockerEnd = Entity.WALL
-        for (positionY in currentState.size - 1 downTo brynjolfCoordinate.posY + 1) {
-            if (currentState[positionY][brynjolfCoordinate.posX] != Entity.EMPTY_SPACE) recentBlockerEnd = currentState[positionY][brynjolfCoordinate.posX]
-        }
-
-        if (recentBlockerStart == Entity.WALL && recentBlockerEnd == Entity.WALL) {
-            listOf(Command.UP, Command.DOWN).forEach { command ->
-                if (isNotBlocked(brynjolfCoordinate, command, Entity.BRYNJOLF) || (guardCoordinates.isNotEmpty() && (guardCoordinates.all { isNotBlocked(it, command, Entity.GUARD) })))
-                    possibleMovesList.add(command)
-            }
-        }
+        possibleMovesList.addAll(getPossibleMovesInSpecificAxis(brynjolfCoordinate, guardCoordinates))
+        possibleMovesList.addAll(getPossibleMovesInSpecificAxis(brynjolfCoordinate, guardCoordinates, false))
 
         return possibleMovesList.toList()
     }
