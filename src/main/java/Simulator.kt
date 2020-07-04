@@ -19,23 +19,26 @@ class Simulator(private val room: Room, moves: List<Command>? = null) {
         return if (remainingMoves.isEmpty()) room.gameState else GameState.WIN
     }
 
-    private fun simulate(room: Room, executedMoves: MutableList<Command> = mutableListOf()): List<Command>? {
+    private fun simulate(room: Room, executedMoves: MutableList<Command> = mutableListOf()): List<Command> {
         if (room.gameState != GameState.UNDECIDED) return executedMoves.toList()
         room.commandIfBrynjolfAndExitInSameLineWithoutBlocker()?.let {
             executedMoves.add(it)
             return executedMoves.toList()
         }
+
         val possibleMoves = room.getPossibleMoves()
-        if (possibleMoves.isEmpty()) return null
-        var verifiedMoves: List<Command>? = null
+        if (possibleMoves.isEmpty()) return emptyList()
+
+        var verifiedMoves: List<Command> = emptyList()
         possibleMoves.forEach {
             if (isRepeatingSequence(executedMoves, it)) return@forEach
             val newRoom = room.executeCommandAsNewRoom(it)
-            val temp = executedMoves.toMutableList()
-            temp.add(it)
-            val simulatedMoves = simulate(newRoom, temp.toMutableList())
-            if (simulatedMoves.isNullOrEmpty()) return@forEach
-            if (verifiedMoves == null || simulatedMoves.size < verifiedMoves!!.size) verifiedMoves = simulatedMoves
+
+            val executedMovesCopy = executedMoves.toMutableList().apply { add(it) }
+            val simulatedMoves = simulate(newRoom, executedMovesCopy)
+
+            if (simulatedMoves.isEmpty()) return@forEach
+            if (verifiedMoves.isEmpty() || simulatedMoves.size < verifiedMoves.size) verifiedMoves = simulatedMoves
         }
         return verifiedMoves
     }
