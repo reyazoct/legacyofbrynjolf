@@ -11,13 +11,12 @@ class Simulator(private val room: Room, moves: List<Command>? = null) {
 
     fun simulate() {
         simulate(room)?.let {
-            room.executeCommands(it)
             remainingMoves.addAll(it)
         }
     }
 
     fun getRoomGameState(): GameState {
-        return room.gameState
+        return if (remainingMoves.isEmpty()) room.gameState else GameState.WIN
     }
 
     private fun simulate(room: Room, executedMoves: MutableList<Command> = mutableListOf()): List<Command>? {
