@@ -53,8 +53,12 @@ class Room(initialState: List<List<Entity>>) {
     private fun changeState(coordinateBeforeCommand: Coordinate, coordinateAfterCommand: Coordinate, entity: Entity, previousEntity: Entity): Entity {
         setGameState(coordinateBeforeCommand, coordinateAfterCommand)
         val entityToStore = currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX]
+        if (currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] == Entity.BRYNJOLF && entityToStore == Entity.EXIT) {
+            currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = Entity.EXIT
+        } else {
+            currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = entity
+        }
         currentState[coordinateBeforeCommand.posY][coordinateBeforeCommand.posX] = previousEntity
-        currentState[coordinateAfterCommand.posY][coordinateAfterCommand.posX] = entity
         return entityToStore
     }
 
